@@ -4,6 +4,9 @@
 ## Specification
 See [Specification in Wiki](https://github.com/mhhoeper/RememberRecipe/wiki/Specification)
 
+## Test script for Recipe JSON interface
+You find a bash script with usage examples for the JSON interface in https://github.com/mhhoeper/RememberRecipe/tree/main/test_recipe_json.
+
 ## Licenses
   The Images used in this project are under the license [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/deed.en). They have not been changed. See them on WikiCommons:
  * https://commons.wikimedia.org/wiki/File:Freres_lamrani.jpg
