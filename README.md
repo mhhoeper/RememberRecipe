@@ -1,6 +1,7 @@
 # RememberRecipe
   Android app that let you photo recipes add some information and send it to a database.
 
+## Specification
 See [Specification in Wiki](https://github.com/mhhoeper/RememberRecipe/wiki/Specification)
 
 ## Licenses
