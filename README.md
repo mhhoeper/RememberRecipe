@@ -3,7 +3,7 @@
 
 See [Specification in Wiki](https://github.com/mhhoeper/RememberRecipe/wiki/Specification)
 
-# Licenses
+## Licenses
   The Images used in this project are under the license [Creative Commons Attribution-Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/deed.en). They have not been changed. See them on WikiCommons:
  * https://commons.wikimedia.org/wiki/File:Freres_lamrani.jpg
  * https://commons.wikimedia.org/wiki/File:Ehemalige_Burgstelle_Dickener_Schl%C3%B6ssle.jpg
