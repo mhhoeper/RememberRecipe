@@ -122,7 +122,7 @@ function main_menu {
 			add_photo_3)        f_add_photo 3;;
 			add_photo_4)        f_add_photo 4;;
 			add_photo_5)        f_add_photo 5;;
-            add_photo_6)        f_add_photo 6;;
+			add_photo_6)        f_add_photo 6;;
 			remove_photo_1)     f_remove_photo_1;;
 			move_photo_2_to_1)  f_move_photo_2_to_1;;
 			quit)               exit ;;
