@@ -61,8 +61,8 @@ f_add_photo() {
     echo "Add photo selection $1 for session_id $session_id"
     echo "Check result in https://recipe.dns-cloud.net/b?session_id=$session_id"
     case $1 in
-        1)   img="testimages/1997-JUGE_AUX_DOSSIERS.jpg";;
-        2)   img="testimages/Abandoned_Home.jpg";;
+        1)   img="testimages/Rocket_template_stub.jpg";;
+        2)   img="testimages/Star_template.jpg";;
         3)   img="testimages/Ehemalige_Burgstelle_Dickener_Schlössle.jpg";;
         4)   img="testimages/800_Houston_St_Manhattan_KS_3.jpg";;
         5)   img="testimages/Complex_Esportiu_LHospitalet_Nord_2.jpg";;
@@ -83,6 +83,10 @@ function f_move_photo_2_to_1 {
 	echo '{"session_id":"'"$session_id"'", "photo_from":2, "photo_to":1}' | curl -X POST -w "%{http_code}\n" -H "Content-Type: application/json" -d @- "$base_addr/move_photo"
 }
 
+function f_read_back_data {
+    echo "Reading back stored data for session id $session_id"
+ 	echo '{"session_id":"'"$session_id"'"}' | curl -X POST -w "%{http_code}\n" -H "Content-Type: application/json" -d @- "$base_addr/read_back_data"
+}
 
 function error_menu {
 	while [ 1 ]
@@ -105,7 +109,7 @@ function main_menu {
 	while [ 1 ]
 	do 
 		PS3='Choose entry: '
-		select choix in "init" "set_title" "get_available_tags" "set_tags" "set_rating" "set_reference" "get_available_ingredients" "set_ingredients" "add_photo_1" "add_photo_2" "add_photo_3" "add_photo_4" "add_photo_5" "add_photo_6" "remove_photo_1" "move_photo_2_to_1" "quit" "errors"
+		select choix in "init" "set_title" "get_available_tags" "set_tags" "set_rating" "set_reference" "get_available_ingredients" "set_ingredients" "add_photo_1" "add_photo_2" "add_photo_3" "add_photo_4" "add_photo_5" "add_photo_6" "remove_photo_1" "move_photo_2_to_1" "read_back_data" "quit" "errors"
 		do
 			break
 		done
@@ -126,6 +130,7 @@ function main_menu {
             add_photo_6)        f_add_photo 6;;
 			remove_photo_1)     f_remove_photo_1;;
 			move_photo_2_to_1)  f_move_photo_2_to_1;;
+			read_back_data)     f_read_back_data;;
 			quit)               exit ;;
 			errors)             error_menu;;
 			*)                  echo "unknown command" ;;
