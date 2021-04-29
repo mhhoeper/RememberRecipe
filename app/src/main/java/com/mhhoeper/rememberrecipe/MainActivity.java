@@ -11,6 +11,7 @@ import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,6 +23,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Environment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 
@@ -35,6 +38,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private static final String URL_STRINGS      = "urlstrings";
     private static final String JSON_SESSION     = "session_id";
+    private static final String JSON_TITLE       = "title";
     private static final String JSON_TAGS        = "tags";
     private static final String JSON_INGREDIENTS = "ingredients";
     private SliderLayout sliderLayout;
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                     .setCallback(new FutureCallback<JsonObject>() {
                         @Override
                         public void onCompleted(Exception e, JsonObject result) {
+                            assert e == null;
+                            assert result != null;
                             if(result.getAsJsonPrimitive(JSON_SESSION) != null) {
                                 mSession = result.getAsJsonPrimitive(JSON_SESSION).getAsBigInteger();
                             } else {
@@ -81,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
                     .setCallback(new FutureCallback<JsonObject>() {
                         @Override
                         public void onCompleted(Exception e, JsonObject result) {
+                            assert e == null;
+                            assert result != null;
                             if(result.getAsJsonArray(JSON_TAGS) != null) {
                                 mTagList = new ArrayList<String>();
                                 JsonArray arr = result.getAsJsonArray(JSON_TAGS);
@@ -100,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
                     .setCallback(new FutureCallback<JsonObject>() {
                         @Override
                         public void onCompleted(Exception e, JsonObject result) {
+                            assert e == null;
+                            assert result != null;
                             if(result.getAsJsonArray(JSON_INGREDIENTS) != null) {
                                 mIngredientsList = new ArrayList<String>();
                                 JsonArray arr = result.getAsJsonArray(JSON_INGREDIENTS);
@@ -124,7 +134,44 @@ public class MainActivity extends AppCompatActivity {
                 onPickImage();
             }
         });
+
+
+        // React on changes
+        TextInputEditText titleinput = findViewById(R.id.input_title);
+        titleinput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // send new title to json interface
+                JsonObject setTitleData = new JsonObject();
+                setTitleData.addProperty(JSON_SESSION, mSession);
+                setTitleData.addProperty(JSON_TITLE, editable.toString());
+                Ion.with(getApplicationContext())
+                        .load("https://recipe.dns-cloud.net/new/set_title")
+                        .setJsonObjectBody(setTitleData)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                assert e == null;
+                                assert result != null;
+
+                                Log.d("JSON Data received", String.valueOf(result));
+                            }
+                        });
+            }
+        });
     }
+
     public void onPickImage() {
         ImagePicker.Companion.with(this).cameraOnly().saveDir(Environment.getExternalStorageDirectory()).start();
     }
