@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mobiledevteam.imagepickertask">
+    package="com.mhhoeper.rememberrecipe">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -19,11 +19,11 @@
         android:supportsRtl="true"
         android:largeHeap="true"
         android:requestLegacyExternalStorage="true"
-        android:theme="@style/Theme.Imagepickertask">
+        android:theme="@style/Theme.RememberRecipe">
         <activity
-            android:name=".MainActivity"
+            android:name="com.mhhoeper.rememberrecipe.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Imagepickertask.NoActionBar">
+            android:theme="@style/Theme.RememberRecipe.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

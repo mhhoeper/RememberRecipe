@@ -1,4 +1,4 @@
-package com.mobiledevteam.imagepickertask;
+package com.mhhoeper.rememberrecipe;
 
 import org.junit.Test;
 
