@@ -9,4 +9,9 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title">Title</string>
+    <string name="floating_camera_action">Floating camera action</string>
+    <string name="reference">Reference</string>
+    <string name="tags">Tags</string>
+    <string name="ingredients">Ingredients</string>
 </resources>

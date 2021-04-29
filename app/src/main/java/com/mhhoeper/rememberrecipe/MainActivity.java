@@ -33,9 +33,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String URL_STRINGS = "urlstrings";
-    private static final String JSON_SESSION = "session_id";
-    private static final String JSON_TAGS = "tags";
+    private static final String URL_STRINGS      = "urlstrings";
+    private static final String JSON_SESSION     = "session_id";
+    private static final String JSON_TAGS        = "tags";
     private static final String JSON_INGREDIENTS = "ingredients";
     private SliderLayout sliderLayout;
     private ArrayList<String> imageUrls;
@@ -51,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         sliderLayout = findViewById(R.id.imageSlider);
         if(savedInstanceState != null) {
-            imageUrls = (ArrayList<String>) savedInstanceState.getStringArrayList(URL_STRINGS);
+            imageUrls = savedInstanceState.getStringArrayList(URL_STRINGS);
             setSliderViews();
             mSession = (BigInteger) savedInstanceState.getSerializable(JSON_SESSION);
-            mTagList = (ArrayList<String>) savedInstanceState.getStringArrayList(JSON_TAGS);
-            mIngredientsList = (ArrayList<String>) savedInstanceState.getStringArrayList(JSON_INGREDIENTS);
+            mTagList = savedInstanceState.getStringArrayList(JSON_TAGS);
+            mIngredientsList = savedInstanceState.getStringArrayList(JSON_INGREDIENTS);
         } else {
             imageUrls=new ArrayList<>();
 
@@ -132,11 +132,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(resultCode == Activity.RESULT_OK){
-            Uri fileUri = data.getData();
-//            mSelImageStatus = "yes";
-//            _txtSelImage.setVisibility(View.GONE);
-//            _imgClinic.setImageURI(fileUri);
-//            File file = ImagePicker.Companion.getFile(data);
+            assert data != null;
+
             String filePath = ImagePicker.Companion.getFilePath(data);
             imageUrls.add(filePath);
             setSliderViews();
@@ -144,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    // Siehe https://medium.com/hootsuite-engineering/handling-orientation-changes-on-android-41a6b62cb43f
-    // und https://stackoverflow.com/questions/151777/how-to-save-an-activity-state-using-save-instance-state
+    // See https://medium.com/hootsuite-engineering/handling-orientation-changes-on-android-41a6b62cb43f
+    // and https://stackoverflow.com/questions/151777/how-to-save-an-activity-state-using-save-instance-state
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

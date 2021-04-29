@@ -41,8 +41,11 @@ dependencies {
 
     //imageslideshow
     implementation "com.android.support:support-v4:+"
-    //implementation 'com.squareup.picasso:picasso:2.3.2'  ->  verarbeitet hochkant-Fotos nicht vernünftig
     implementation 'com.squareup.picasso:picasso:2.5.2'
+    // Version 2.3.2 does not correctly process portrait photos
+    // Version 2.71828 let the app continuously crash
+    // Version 2.8 let the app continuously crash. Is the slider not compatible?
+    //implementation 'com.squareup.picasso:picasso:2.3.2'
     //implementation 'com.squareup.picasso:picasso:2.71828'  -> hat zu Absturz geführt
     //implementation 'com.squareup.picasso:picasso:2.8'  -> hat zu Absturz geführt. slider nicht kompatibel?
     implementation 'com.nineoldandroids:library:2.4.0'
