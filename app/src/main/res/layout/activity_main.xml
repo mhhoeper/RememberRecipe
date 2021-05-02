@@ -30,40 +30,72 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/title"/>
+                        android:text="@string/title" />
+
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/input_title"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:orientation="vertical">
+
                     <com.daimajia.slider.library.SliderLayout
+                        android:id="@+id/imageSlider"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:id="@+id/imageSlider"
-                        android:background="#DFDFDF"/>
+                        android:background="#DFDFDF" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating" />
+
+                    <RatingBar
+                        android:id="@+id/ratingBar"
+                        style="@style/Widget.AppCompat.RatingBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:numStars="5"
+                        android:rating="1"
+                        android:stepSize="0.5" />
+
+                </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
