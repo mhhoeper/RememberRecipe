@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String JSON_TITLE       = "title";
     private static final String JSON_RATING      = "rating";
     private static final String JSON_TAGS        = "tags";
+    private static final String JSON_REFERENCE   = "reference";
     private static final String JSON_PHOTO       = "photodata";
     private static final String JSON_INGREDIENTS = "ingredients";
     private SliderLayout sliderLayout;
@@ -170,6 +171,39 @@ public class MainActivity extends AppCompatActivity {
                 Ion.with(getApplicationContext())
                         .load("https://recipe.dns-cloud.net/new/set_title")
                         .setJsonObjectBody(setTitleData)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                assert e == null;
+                                assert result != null;
+
+                                Log.d("JSON Data received", String.valueOf(result));
+                            }
+                        });
+            }
+        });
+        TextInputEditText refInput = findViewById(R.id.input_ref);
+        refInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // send new reference to json interface
+                JsonObject setReferenceData = new JsonObject();
+                setReferenceData.addProperty(JSON_SESSION, mSession);
+                setReferenceData.addProperty(JSON_REFERENCE, editable.toString());
+                Ion.with(getApplicationContext())
+                        .load("https://recipe.dns-cloud.net/new/set_reference")
+                        .setJsonObjectBody(setReferenceData)
                         .asJsonObject()
                         .setCallback(new FutureCallback<JsonObject>() {
                             @Override
