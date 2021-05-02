@@ -2,6 +2,8 @@ package com.mhhoeper.rememberrecipe;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -25,13 +27,19 @@ import androidx.appcompat.widget.Toolbar;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RatingBar;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
@@ -39,11 +47,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String URL_STRINGS      = "urlstrings";
     private static final String JSON_SESSION     = "session_id";
     private static final String JSON_TITLE       = "title";
+    private static final String JSON_RATING      = "rating";
     private static final String JSON_TAGS        = "tags";
+    private static final String JSON_PHOTO       = "photodata";
     private static final String JSON_INGREDIENTS = "ingredients";
     private SliderLayout sliderLayout;
     private ArrayList<String> imageUrls;
     private BigInteger mSession;
+    private int mRating;
     private ArrayList<String> mTagList;
     private ArrayList<String> mIngredientsList;
 
@@ -58,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
             imageUrls = savedInstanceState.getStringArrayList(URL_STRINGS);
             setSliderViews();
             mSession = (BigInteger) savedInstanceState.getSerializable(JSON_SESSION);
+            mRating = savedInstanceState.getInt("JSON_RATING");
             mTagList = savedInstanceState.getStringArrayList(JSON_TAGS);
             mIngredientsList = savedInstanceState.getStringArrayList(JSON_INGREDIENTS);
         } else {
@@ -170,6 +182,28 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         });
+        RatingBar ratinginput = findViewById(R.id.ratingBar);
+        ratinginput.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+                JsonObject setRatingData = new JsonObject();
+                setRatingData.addProperty(JSON_SESSION, mSession);
+                setRatingData.addProperty(JSON_RATING, v);
+                Ion.with(getApplicationContext())
+                        .load("https://recipe.dns-cloud.net/new/set_rating")
+                        .setJsonObjectBody(setRatingData)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                assert e == null;
+                                assert result != null;
+
+                                Log.d("JSON Data received", String.valueOf(result));
+                            }
+                        });
+            }
+        });
     }
 
     public void onPickImage() {
@@ -183,6 +217,44 @@ public class MainActivity extends AppCompatActivity {
 
             String filePath = ImagePicker.Companion.getFilePath(data);
             imageUrls.add(filePath);
+
+            // send new image to server
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] bytes;
+            try {
+                InputStream inputStream = new FileInputStream(filePath);
+
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+
+                while ( (bytesRead = inputStream.read(buffer)) != -1 ) {
+                    baos.write(buffer, 0, bytesRead);
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            bytes = baos.toByteArray();
+            String encodedImage = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+            JsonObject setPhotoData = new JsonObject();
+            setPhotoData.addProperty(JSON_SESSION, mSession);
+            setPhotoData.addProperty(JSON_PHOTO, encodedImage);
+            Ion.with(getApplicationContext())
+                    .load("https://recipe.dns-cloud.net/new/add_photo")
+                    .setJsonObjectBody(setPhotoData)
+                    .asJsonObject()
+                    .setCallback(new FutureCallback<JsonObject>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonObject result) {
+                            assert e == null;
+                            assert result != null;
+
+                            Log.d("JSON Data received", String.valueOf(result));
+                        }
+                    });
+
+            // update slider
             setSliderViews();
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -194,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(JSON_SESSION, mSession);
+        outState.putInt(JSON_RATING, mRating);
         outState.putStringArrayList(JSON_TAGS, mTagList);
         outState.putStringArrayList(JSON_INGREDIENTS, mIngredientsList);
         outState.putStringArrayList(URL_STRINGS, imageUrls);
