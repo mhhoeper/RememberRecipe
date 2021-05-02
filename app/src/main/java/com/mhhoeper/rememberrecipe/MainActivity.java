@@ -2,9 +2,6 @@ package com.mhhoeper.rememberrecipe;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 
 import com.daimajia.slider.library.SliderLayout;
@@ -42,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String URL_STRINGS      = "urlstrings";
@@ -59,6 +57,94 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> mTagList;
     private ArrayList<String> mIngredientsList;
 
+
+    // This function clears all fields and the slider and reinizalizes the app. After calling this
+    // function the app should behave like newly started.
+    private void initializeEmptyUI() {
+        // Setting mSession to 0 makes all ui update functions skip the update
+        mSession = BigInteger.ZERO;
+
+        TextInputEditText titleInput = findViewById(R.id.input_title);
+        titleInput.getText().clear();
+
+        RatingBar ratingInput = findViewById(R.id.ratingBar);
+        ratingInput.setRating(0);
+
+        TextInputEditText tagsInput = findViewById(R.id.input_tags);
+        tagsInput.getText().clear();
+
+        TextInputEditText refInput = findViewById(R.id.input_ref);
+        refInput.getText().clear();
+
+        TextInputEditText ingredientsInput = findViewById(R.id.input_ingre);
+        ingredientsInput.getText().clear();
+
+        imageUrls=new ArrayList<>();
+        setSliderViews();
+        //sliderLayout.getCurrentSlider().getView().refreshDrawableState();
+
+        Ion.getDefault(getApplicationContext()).getConscryptMiddleware().enable(false);
+        Ion.with(getApplicationContext())
+                .load("https://recipe.dns-cloud.net/new/new_set")
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        assert e == null;
+                        assert result != null;
+                        if(result.getAsJsonPrimitive(JSON_SESSION) != null) {
+                            mSession = result.getAsJsonPrimitive(JSON_SESSION).getAsBigInteger();
+                        } else {
+                            mSession = BigInteger.ZERO;
+                        }
+
+                        Log.d("JSON Data received", String.valueOf(result));
+                    }
+                });
+        Ion.with(getApplicationContext())
+                .load("https://recipe.dns-cloud.net/new/get_available_tags")
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        assert e == null;
+                        assert result != null;
+                        if(result.getAsJsonArray(JSON_TAGS) != null) {
+                            mTagList = new ArrayList<String>();
+                            JsonArray arr = result.getAsJsonArray(JSON_TAGS);
+                            for(JsonElement el : arr){
+                                mTagList.add(el.getAsString());
+                            }
+                        } else {
+                            mTagList = new ArrayList<String>();
+                        }
+
+                        Log.d("JSON Data received", String.valueOf(result));
+                    }
+                });
+        Ion.with(getApplicationContext())
+                .load("https://recipe.dns-cloud.net/new/get_available_ingredients")
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        assert e == null;
+                        assert result != null;
+                        if(result.getAsJsonArray(JSON_INGREDIENTS) != null) {
+                            mIngredientsList = new ArrayList<String>();
+                            JsonArray arr = result.getAsJsonArray(JSON_INGREDIENTS);
+                            for(JsonElement el : arr){
+                                mIngredientsList.add(el.getAsString());
+                            }
+                        } else {
+                            mIngredientsList = new ArrayList<String>();
+                        }
+
+                        Log.d("JSON Data received", String.valueOf(result));
+                    }
+                });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,68 +160,7 @@ public class MainActivity extends AppCompatActivity {
             mTagList = savedInstanceState.getStringArrayList(JSON_TAGS);
             mIngredientsList = savedInstanceState.getStringArrayList(JSON_INGREDIENTS);
         } else {
-            imageUrls=new ArrayList<>();
-
-            Ion.getDefault(getApplicationContext()).getConscryptMiddleware().enable(false);
-            Ion.with(getApplicationContext())
-                    .load("https://recipe.dns-cloud.net/new/new_set")
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonObject result) {
-                            assert e == null;
-                            assert result != null;
-                            if(result.getAsJsonPrimitive(JSON_SESSION) != null) {
-                                mSession = result.getAsJsonPrimitive(JSON_SESSION).getAsBigInteger();
-                            } else {
-                                mSession = new BigInteger("0");
-                            }
-
-                            Log.d("JSON Data received", String.valueOf(result));
-                        }
-                    });
-            Ion.with(getApplicationContext())
-                    .load("https://recipe.dns-cloud.net/new/get_available_tags")
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonObject result) {
-                            assert e == null;
-                            assert result != null;
-                            if(result.getAsJsonArray(JSON_TAGS) != null) {
-                                mTagList = new ArrayList<String>();
-                                JsonArray arr = result.getAsJsonArray(JSON_TAGS);
-                                for(JsonElement el : arr){
-                                    mTagList.add(el.getAsString());
-                                }
-                            } else {
-                                mTagList = new ArrayList<String>();
-                            }
-
-                            Log.d("JSON Data received", String.valueOf(result));
-                        }
-                    });
-            Ion.with(getApplicationContext())
-                    .load("https://recipe.dns-cloud.net/new/get_available_ingredients")
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonObject result) {
-                            assert e == null;
-                            assert result != null;
-                            if(result.getAsJsonArray(JSON_INGREDIENTS) != null) {
-                                mIngredientsList = new ArrayList<String>();
-                                JsonArray arr = result.getAsJsonArray(JSON_INGREDIENTS);
-                                for(JsonElement el : arr){
-                                    mIngredientsList.add(el.getAsString());
-                                }
-                            } else {
-                                mIngredientsList = new ArrayList<String>();
-                            }
-
-                            Log.d("JSON Data received", String.valueOf(result));
-                        }
-                    });
+            initializeEmptyUI();
         }
 
 //        setSliderViews_main();
@@ -164,6 +189,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                // exit if no session is prepared
+                if(mSession.compareTo(BigInteger.ZERO) == 0)  {
+                    return;
+                }
+
                 // send new title to json interface
                 JsonObject setTitleData = new JsonObject();
                 setTitleData.addProperty(JSON_SESSION, mSession);
@@ -197,6 +227,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                // exit if no session is prepared
+                if(mSession.compareTo(BigInteger.ZERO) == 0) {
+                    return;
+                }
+
                 // send new reference to json interface
                 JsonObject setReferenceData = new JsonObject();
                 setReferenceData.addProperty(JSON_SESSION, mSession);
@@ -220,6 +255,11 @@ public class MainActivity extends AppCompatActivity {
         ratinginput.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+                // exit if no session is prepared
+                if(mSession.compareTo(BigInteger.ZERO) == 0) {
+                    return;
+                }
+
                 JsonObject setRatingData = new JsonObject();
                 setRatingData.addProperty(JSON_SESSION, mSession);
                 setRatingData.addProperty(JSON_RATING, v);
@@ -252,6 +292,8 @@ public class MainActivity extends AppCompatActivity {
             String filePath = ImagePicker.Companion.getFilePath(data);
             imageUrls.add(filePath);
 
+            Log.d("Image added to list, creating byte array now", filePath);
+
             // send new image to server
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] bytes;
@@ -266,27 +308,37 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             catch (IOException e) {
+                Log.e("Error creating photo byte array", "", e);
                 e.printStackTrace();
             }
             bytes = baos.toByteArray();
+
+            Log.d("Byte array created. Do base64 encoding now.", Integer.toString(baos.size()));
+
             String encodedImage = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+            Log.d("Image is encoded now. Sending data.", Integer.toString(encodedImage.length()));
 
             JsonObject setPhotoData = new JsonObject();
             setPhotoData.addProperty(JSON_SESSION, mSession);
             setPhotoData.addProperty(JSON_PHOTO, encodedImage);
-            Ion.with(getApplicationContext())
-                    .load("https://recipe.dns-cloud.net/new/add_photo")
-                    .setJsonObjectBody(setPhotoData)
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonObject result) {
-                            assert e == null;
-                            assert result != null;
+            try {
+                JsonObject photoDataResult = Ion.with(getApplicationContext())
+                        .load("https://recipe.dns-cloud.net/new/add_photo")
+                        .setJsonObjectBody(setPhotoData)
+                        .asJsonObject()
+                        .get();
 
-                            Log.d("JSON Data received", String.valueOf(result));
-                        }
-                    });
+                Log.d("JSON Data received", String.valueOf(photoDataResult));
+            }
+            catch(ExecutionException e) {
+                Log.e("JSON Data Execution Exception", e.toString(), e);
+            }
+            catch(InterruptedException e) {
+                Log.e("JSON Data Interrupted Exception", e.toString(), e);
+            }
+
+            Log.d("Sending image finished.", "");
 
             // update slider
             setSliderViews();
@@ -349,7 +401,9 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_new) {
+            // clear all fields
+            initializeEmptyUI();
             return true;
         }
 
