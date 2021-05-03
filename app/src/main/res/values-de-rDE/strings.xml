@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rezepte Erinnern</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="first_fragment_label">Erstes Fragment</string>
+    <string name="second_fragment_label">Zweites Fragment</string>
+    <string name="next">Nächster</string>
+    <string name="previous">Vorhergehender</string>
+    <string name="hello_first_fragment">Hallo erstes Fragment</string>
+    <string name="hello_second_fragment">Hallo zweites Fragment</string>
+    <string name="title">Titel</string>
+    <string name="floating_camera_action">Kamera</string>
+    <string name="reference">Quelle</string>
+    <string name="tags">Tags</string>
+    <string name="ingredients">Zutaten</string>
+    <string name="rating">Bewertung</string>
+    <string name="action_new">Neu</string>
+</resources>

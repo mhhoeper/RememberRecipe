@@ -30,6 +30,9 @@ import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.RatingBar;
 
 import java.io.ByteArrayOutputStream;
@@ -70,13 +73,13 @@ public class MainActivity extends AppCompatActivity {
         RatingBar ratingInput = findViewById(R.id.ratingBar);
         ratingInput.setRating(0);
 
-        TextInputEditText tagsInput = findViewById(R.id.input_tags);
+        MultiAutoCompleteTextView tagsInput = findViewById(R.id.input_tags);
         tagsInput.getText().clear();
 
         TextInputEditText refInput = findViewById(R.id.input_ref);
         refInput.getText().clear();
 
-        TextInputEditText ingredientsInput = findViewById(R.id.input_ingre);
+        MultiAutoCompleteTextView ingredientsInput = findViewById(R.id.input_ingredients);
         ingredientsInput.getText().clear();
 
         imageUrls=new ArrayList<>();
@@ -115,8 +118,20 @@ public class MainActivity extends AppCompatActivity {
                             for(JsonElement el : arr){
                                 mTagList.add(el.getAsString());
                             }
+
+                            // Prepare Autocomplete tags
+                            MultiAutoCompleteTextView tagsView = findViewById(R.id.input_tags);
+                            ArrayAdapter<String> adapter =
+                                    new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, mTagList);
+                            tagsView.setAdapter(adapter);
+                            tagsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
                         } else {
                             mTagList = new ArrayList<String>();
+
+                            // Disable autocomplete as no tags are available
+                            MultiAutoCompleteTextView tagsView = findViewById(R.id.input_tags);
+                            tagsView.setAdapter(null);
+                            tagsView.setTokenizer(null);
                         }
 
                         Log.d("JSON Data received", String.valueOf(result));
@@ -136,8 +151,20 @@ public class MainActivity extends AppCompatActivity {
                             for(JsonElement el : arr){
                                 mIngredientsList.add(el.getAsString());
                             }
+
+                            // Prepare Autocomplete tags
+                            MultiAutoCompleteTextView ingredientsView = findViewById(R.id.input_ingredients);
+                            ArrayAdapter<String> adapter =
+                                    new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, mIngredientsList);
+                            ingredientsView.setAdapter(adapter);
+                            ingredientsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
                         } else {
                             mIngredientsList = new ArrayList<String>();
+
+                            // Disable autocomplete as no ingredients are available
+                            MultiAutoCompleteTextView ingredientsView = findViewById(R.id.input_ingredients);
+                            ingredientsView.setAdapter(null);
+                            ingredientsView.setTokenizer(null);
                         }
 
                         Log.d("JSON Data received", String.valueOf(result));
@@ -172,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
                 onPickImage();
             }
         });
-
 
         // React on changes
         TextInputEditText titleinput = findViewById(R.id.input_title);
@@ -213,6 +239,46 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         });
+
+        MultiAutoCompleteTextView tagInput = findViewById(R.id.input_tags);
+        tagInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // exit if no session is prepared
+                if(mSession.compareTo(BigInteger.ZERO) == 0) {
+                    return;
+                }
+
+                // send new reference to json interface
+                JsonObject setTagData = new JsonObject();
+                setTagData.addProperty(JSON_SESSION, mSession);
+                setTagData.addProperty(JSON_TAGS, editable.toString());
+                Ion.with(getApplicationContext())
+                        .load("https://recipe.dns-cloud.net/new/set_tags")
+                        .setJsonObjectBody(setTagData)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                assert e == null;
+                                assert result != null;
+
+                                Log.d("JSON Data Received", String.valueOf(result));
+                            }
+                        });
+            }
+        });
+
         TextInputEditText refInput = findViewById(R.id.input_ref);
         refInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -251,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         });
+
         RatingBar ratinginput = findViewById(R.id.ratingBar);
         ratinginput.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -278,6 +345,45 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         });
+
+        MultiAutoCompleteTextView ingredientsInput = findViewById(R.id.input_ingredients);
+        ingredientsInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // exit if no session is prepared
+                if(mSession.compareTo(BigInteger.ZERO) == 0) {
+                    return;
+                }
+
+                // send new reference to json interface
+                JsonObject setIngredientsData = new JsonObject();
+                setIngredientsData.addProperty(JSON_SESSION, mSession);
+                setIngredientsData.addProperty(JSON_INGREDIENTS, editable.toString());
+                Ion.with(getApplicationContext())
+                        .load("https://recipe.dns-cloud.net/new/set_ingredients")
+                        .setJsonObjectBody(setIngredientsData)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                assert e == null;
+                                assert result != null;
+
+                                Log.d("JSON Data Received", String.valueOf(result));
+                            }
+                        });
+            }
+        });
     }
 
     public void onPickImage() {
@@ -292,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
             String filePath = ImagePicker.Companion.getFilePath(data);
             imageUrls.add(filePath);
 
-            Log.d("Image added to list, creating byte array now", filePath);
+            Log.d("Photo", "Image added to list, creating byte array now." + filePath);
 
             // send new image to server
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -308,16 +414,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             catch (IOException e) {
-                Log.e("Error creating photo byte array", "", e);
+                Log.e("Photo", "Error creating photo byte array.", e);
                 e.printStackTrace();
             }
             bytes = baos.toByteArray();
 
-            Log.d("Byte array created. Do base64 encoding now.", Integer.toString(baos.size()));
+            Log.d("Photo", "Byte array created. Do base64 encoding now. " + Integer.toString(baos.size()));
 
             String encodedImage = Base64.encodeToString(bytes, Base64.DEFAULT);
 
-            Log.d("Image is encoded now. Sending data.", Integer.toString(encodedImage.length()));
+            Log.d("Photo", "Image is encoded now. Sending data. " + Integer.toString(encodedImage.length()));
 
             JsonObject setPhotoData = new JsonObject();
             setPhotoData.addProperty(JSON_SESSION, mSession);
@@ -332,10 +438,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("JSON Data received", String.valueOf(photoDataResult));
             }
             catch(ExecutionException e) {
-                Log.e("JSON Data Execution Exception", e.toString(), e);
+                Log.e("Photo", "JSON Data Execution Exception " + e.toString(), e);
             }
             catch(InterruptedException e) {
-                Log.e("JSON Data Interrupted Exception", e.toString(), e);
+                Log.e("Photo", "JSON Data Interrupted Exception " + e.toString(), e);
             }
 
             Log.d("Sending image finished.", "");

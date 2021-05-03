@@ -103,18 +103,22 @@
                     android:layout_marginEnd="20dp"
                     android:layout_marginTop="20dp"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tags"/>
+                        android:text="@string/tags" />
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <com.google.android.material.textfield.TextInputEditText
+
+                        <MultiAutoCompleteTextView
                             android:id="@+id/input_tags"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:lines="2" />
+
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
                 <LinearLayout
@@ -155,11 +159,13 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/input_ingre"
+
+                        <MultiAutoCompleteTextView
+                            android:id="@+id/input_ingredients"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:lines="6"/>
+                            android:layout_weight="1"
+                            android:lines="5" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </LinearLayout>
